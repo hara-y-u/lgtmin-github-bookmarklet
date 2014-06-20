@@ -3,41 +3,35 @@ var util = require('util')
 , common = require('koa-common')
 , router = require('koa-router')
 , Q = require('q')
-, GitHubApi = require("github")
-, app = koa()
-, github = new GitHubApi({
-  // required
-  version: '3.0.0',
-  // optional
-  debug: true,
-  protocol: 'https',
-  timeout: 5000
-})
 , port = process.env.PORT || 3000
+, app = koa()
+, key = process.env.APP_KEY || 'im a secret'
+, Client = require('./gitHubApiClient.js')
+, client
 ;
 
 app.use(common.logger());
-app.keys = ['FIXME'];
+app.keys = [key];
 app.use(common.session());
 app.use(router(app));
 
+client = new Client(app);
+
 app.get('/', function *(next) {
-  // github api example
-  var res = yield Q.denodeify(github.user.getFollowingFromUser)({
-    user: 'mikedeboer'
-  }).then(function(res) {
-    return res;
+  yield client.authenticate(this, function *(err, github){
+    var res
+    ;
+
+    res = yield Q.denodeify(github.pullRequests.getAll)({
+      user: this.request.query.user
+      , repo: this.request.query.repo
+      , state: 'all'
+    }).then(function(res) {
+      return res;
+    });
+
+    this.body = util.inspect(res);
   });
-
-  // session example
-  var n = this.session.views || 0;
-  this.session.views = ++n;
-
-  this.body = n + 'views\n\n' + util.inspect(res);
-});
-
-app.get('/login', function *(next) {
-  
 });
 
 app.listen(port);
