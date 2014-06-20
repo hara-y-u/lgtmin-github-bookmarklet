@@ -13,6 +13,7 @@ var util = require('util')
   protocol: 'https',
   timeout: 5000
 })
+, port = process.env.PORT || 3000
 ;
 
 app.use(common.logger());
@@ -39,4 +40,4 @@ app.get('/login', function *(next) {
   
 });
 
-app.listen(3000);
+app.listen(port);
