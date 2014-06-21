@@ -1,4 +1,4 @@
-lgtmin-github-bookmarklet
+[WIP] lgtmin-github-bookmarklet
 =========================
 
 LGTM on GitHub in any browser!
