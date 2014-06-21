@@ -6,7 +6,7 @@ var util = require('util')
 , port = process.env.PORT || 3000
 , app = koa()
 , key = process.env.APP_KEY || 'im a secret'
-, Client = require('./gitHubApiClient.js')
+, Client = require('./github-api-client.js')
 , client
 ;
 

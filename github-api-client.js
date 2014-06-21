@@ -11,6 +11,12 @@ var GitHubApi = require("github")
 
 module.exports = GitHubApiClient;
 
+/**
+ * abstracts retriving access token of github api
+ * @param {Object} app koa app object configured to use session and route
+ * @param {Object} options
+ *   - [`callbackPath`] OAuth callback path
+ */
 function GitHubApiClient(app, options) {
   var self = this
   , requestAccessToken
