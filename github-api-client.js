@@ -1,7 +1,5 @@
 var GitHubApi = require("github")
 , util = require('util')
-, common = require('koa-common')
-, Q = require('q')
 , OAuth2 = require("oauth").OAuth2
 , AUTH = {
   clientId: process.env.GITHUB_API_CLIENT_ID || ''
@@ -65,7 +63,8 @@ function GitHubApiClient(app, options) {
         ctx.response.redirect('/');
       }
     } catch (e) {
-      ctx.body = util.inspect(e);
+      ctx.body = 'An error has occurred during retriving access token: '
+        + util.inspect(e);
     }
   });
 }
@@ -105,7 +104,7 @@ GitHubApiClient.prototype = {
           this.saveToken(ctx, null);
           this.authenticate(ctx, callback);
         } else {
-          console.log(util.inspect(e));
+          throw e;
         }
       }
     }
