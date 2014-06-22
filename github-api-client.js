@@ -26,7 +26,7 @@ function GitHubApiClient(app, options) {
     // required
     version: '3.0.0',
     // optional
-    debug: true,
+    debug: 'development' == process.env.NODE_ENV,
     protocol: 'https',
     timeout: 5000
   });
