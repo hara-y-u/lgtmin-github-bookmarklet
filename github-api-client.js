@@ -1,3 +1,5 @@
+'use strict';
+
 var GitHubApi = require("github")
 , util = require('util')
 , OAuth2 = require("oauth").OAuth2

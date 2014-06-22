@@ -23,7 +23,8 @@
     "koa-router": "~3.1.4",
     "q": "~1.0.1",
     "github": "~0.2.0",
-    "oauth": "~0.9.12"
+    "oauth": "~0.9.12",
+    "koa-csrf": "~2.1.2"
   },
   "devDependencies": {
     "boomlet": "~1.0.0"

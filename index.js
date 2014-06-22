@@ -1,3 +1,5 @@
+'use strict';
+
 var util = require('util')
 , koa = require('koa')
 , common = require('koa-common')
@@ -5,6 +7,7 @@ var util = require('util')
 , Q = require('q')
 , port = process.env.PORT || 3000
 , app = koa()
+, csrf = require('koa-csrf')
 , key = process.env.APP_KEY || 'im a secret'
 , Client = require('github-api-client')
 , client
@@ -16,14 +19,24 @@ var util = require('util')
 app.use(common.logger());
 app.keys = [key];
 app.use(common.session());
+csrf(app);
+app.use(csrf.middleware);
+app.use(function* () {
+  if (this.method === 'GET') {
+    this.body = this.csrf
+  } else if (this.method === 'POST') {
+    this.status = 204
+  }
+});
 app.use(router(app));
 
 client = new Client(app);
 
 app.get('/', function *(next) {
+  this.body = 'hello';
 });
 
-app.get('/lgtm', function *(next) {
+app.post('/lgtm', function *(next) {
   yield client.authenticate(this, function *(err, github){
     var ret
     , req = this.request
