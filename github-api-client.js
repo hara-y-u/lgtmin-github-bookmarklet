@@ -90,7 +90,7 @@ GitHubApiClient.prototype = {
     if (!token) {
       ctx.response.redirect(this.oauth.getAuthorizeUrl({
         redirect_uri: this.urlToHost(ctx) + this.callbackPath
-        , scope: 'repo,repo:status,user'
+        , scope: 'repo'
       }));
     } else {
       this.github.authenticate({
