@@ -6,8 +6,11 @@ var util = require('util')
 , port = process.env.PORT || 3000
 , app = koa()
 , key = process.env.APP_KEY || 'im a secret'
-, Client = require('./github-api-client.js')
+, Client = require('github-api-client')
 , client
+, lgtmMarkdown = function(hash) {
+  return '![LGTM](http://www.lgtm.in/p/' + hash + ')';
+}
 ;
 
 app.use(common.logger());
@@ -18,19 +21,28 @@ app.use(router(app));
 client = new Client(app);
 
 app.get('/', function *(next) {
+});
+
+app.get('/lgtm', function *(next) {
   yield client.authenticate(this, function *(err, github){
-    var res
+    var ret
+    , req = this.request
+    , user = req.query.user
+    , repo = req.query.repo
+    , number = req.query.number
+    , hash = req.query.hash
     ;
 
-    res = yield Q.denodeify(github.pullRequests.getAll)({
-      user: this.request.query.user
-      , repo: this.request.query.repo
-      , state: 'all'
-    }).then(function(res) {
-      return res;
+    ret = yield Q.denodeify(github.issues.createComment)({
+      user: user
+      , repo: repo
+      , number: number
+      , body: lgtmMarkdown(hash)
+    }).then(function(comments) {
+      return comments;
     });
 
-    this.body = util.inspect(res);
+    this.body = util.inspect(ret);
   });
 });
 

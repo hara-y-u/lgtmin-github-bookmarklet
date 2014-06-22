@@ -63,8 +63,9 @@ function GitHubApiClient(app, options) {
         ctx.response.redirect('/');
       }
     } catch (e) {
-      ctx.body = 'An error has occurred during retriving access token: '
-        + util.inspect(e);
+      console.log('An error has occurred during retriving access token: '
+                  + util.inspect(e));
+      throw e;
     }
   });
 }
