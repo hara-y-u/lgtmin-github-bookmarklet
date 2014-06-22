@@ -100,6 +100,8 @@ GitHubApiClient.prototype = {
       try {
         yield callback.call(ctx, null, this.github);
       } catch (e) {
+        console.log('An error has occurred on using GitHub API: '
+                    + util.inspect(e));
         // FIXME
         if (e.message.toString().indexOf('Bad credentials') > -1) {
           this.saveToken(ctx, null);
