@@ -68,7 +68,7 @@ function GitHubApiClient(app, options) {
     ;
 
     decodedState = yield verifyState(state);
-    if(decodedState.rfp != this.session.csrf) {
+    if(decodedState.rfp != this.session.github_api_client_csrf) {
       this.throw('OAuth state parameters dont match.');
     }
 
@@ -101,7 +101,7 @@ GitHubApiClient.prototype = {
   }
   , authenticate: function *(ctx, callback) {
     var token = this.loadToken(ctx)
-    , csrf = ctx.session.csrf = ctx.csrf
+    , csrf = ctx.session.github_api_client_csrf = ctx.csrf
     , state = jwt.sign({rfp: csrf}, this._app.keys[0])
     ;
 
