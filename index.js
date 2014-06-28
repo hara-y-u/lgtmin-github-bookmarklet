@@ -21,13 +21,13 @@ app.keys = [key];
 app.use(common.session());
 csrf(app);
 app.use(csrf.middleware);
-app.use(function* () {
-  if (this.method === 'GET') {
-    this.body = this.csrf
-  } else if (this.method === 'POST') {
-    this.status = 204
-  }
-});
+// app.use(function* () {
+//   if (this.method === 'GET') {
+//     this.body = this.csrf
+//   } else if (this.method === 'POST') {
+//     this.status = 204
+//   }
+// });
 app.use(router(app));
 
 client = new Client(app);
@@ -36,8 +36,8 @@ app.get('/', function *(next) {
   this.body = 'hello';
 });
 
-app.post('/lgtm', function *(next) {
-  yield client.authenticate(this, function *(err, github){
+app.get('/lgtm', function *(next) {
+  yield client.authenticate(this, function *(github){
     var ret
     , req = this.request
     , user = req.query.user

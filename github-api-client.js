@@ -49,6 +49,7 @@ function GitHubApiClient(app, options) {
   };
 
   // Configure App
+  // TODO: use state parameter to protect from forgery
   app.get(this.callbackPath, function *(next) {
     var code = this.request.query.code
     , ctx = this
@@ -100,14 +101,14 @@ GitHubApiClient.prototype = {
         , token: token
       });
       try {
-        yield callback.call(ctx, null, this.github);
+        yield callback.call(ctx, this.github);
       } catch (e) {
         console.log('An error has occurred on using GitHub API: '
                     + util.inspect(e));
-        // FIXME
-        if (e.message.toString().indexOf('Bad credentials') > -1) {
+        if (e.code == 401) {
           this.saveToken(ctx, null);
-          this.authenticate(ctx, callback);
+          ctx.response.redirect(this.urlToHost(ctx)
+                                + ctx.request.originalUrl);
         } else {
           throw e;
         }
