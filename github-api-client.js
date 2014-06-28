@@ -106,9 +106,9 @@ GitHubApiClient.prototype = {
         console.log('An error has occurred on using GitHub API: '
                     + util.inspect(e));
         if (e.code == 401) {
+          console.log('Reset Token..')
           this.saveToken(ctx, null);
-          ctx.response.redirect(this.urlToHost(ctx)
-                                + ctx.request.originalUrl);
+          yield this.authenticate(ctx, callback);
         } else {
           throw e;
         }
