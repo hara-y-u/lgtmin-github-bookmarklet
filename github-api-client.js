@@ -2,6 +2,7 @@
 
 var GitHubApi = require("github")
 , util = require('util')
+, jwt = require('jsonwebtoken')
 , OAuth2 = require("oauth").OAuth2
 , AUTH = {
   clientId: process.env.GITHUB_API_CLIENT_ID || ''
@@ -13,16 +14,19 @@ module.exports = GitHubApiClient;
 
 /**
  * abstracts retriving access token of github api
- * @param {Object} app koa app object configured to use session and route
+ * @param {Object} app koa app object configured to use session, route and csrf
  * @param {Object} options
  *   - [`callbackPath`] OAuth callback path
  */
 function GitHubApiClient(app, options) {
   var self = this
   , requestAccessToken
+  , verifyState
   ;
 
   options = options || {};
+
+  this._app = app;
 
   this.github = new GitHubApi({
     // required
@@ -48,13 +52,25 @@ function GitHubApiClient(app, options) {
     };
   };
 
+  verifyState = function(state) {
+    return function(callback) {
+      jwt.verify(state, app.keys[0], callback);
+    }
+  };
+
   // Configure App
-  // TODO: use state parameter to protect from forgery
   app.get(this.callbackPath, function *(next) {
     var code = this.request.query.code
+    , state = this.request.query.state
+    , decodedState
     , ctx = this
     , accessToken
     ;
+
+    decodedState = yield verifyState(state);
+    if(decodedState.rfp != this.session.csrf) {
+      this.throw('OAuth state parameters dont match.');
+    }
 
     try {
       accessToken = (yield requestAccessToken(code))[0];
@@ -85,6 +101,8 @@ GitHubApiClient.prototype = {
   }
   , authenticate: function *(ctx, callback) {
     var token = this.loadToken(ctx)
+    , csrf = ctx.session.csrf = ctx.csrf
+    , state = jwt.sign({rfp: csrf}, this._app.keys[0])
     ;
 
     ctx.session.github_api_client_redirect_path
@@ -94,6 +112,7 @@ GitHubApiClient.prototype = {
       ctx.response.redirect(this.oauth.getAuthorizeUrl({
         redirect_uri: this.urlToHost(ctx) + this.callbackPath
         , scope: 'repo'
+        , state: state
       }));
     } else {
       this.github.authenticate({
