@@ -99,7 +99,7 @@ GitHubApiClient.prototype = {
   , urlToHost: function(ctx) {
     return ctx.request.protocol + '://' + ctx.request.get('host');
   }
-  , authenticate: function *(ctx, callback) {
+  , authenticate: function(ctx) {
     var token = this.loadToken(ctx)
     , csrf = ctx.session.github_api_client_csrf = ctx.csrf
     , state = jwt.sign({rfp: csrf}, this._app.keys[0])
@@ -116,36 +116,36 @@ GitHubApiClient.prototype = {
       }));
     } else {
       try {
-        yield callback.call(ctx, token);
+        return token;
       } catch (e) {
         console.log('An error has occurred on using GitHub API: '
                     + util.inspect(e));
         if (e.code == 401) {
           console.log('Reset Token..')
           this.saveToken(ctx, null);
-          yield this.authenticate(ctx, callback);
+          this.authenticate(ctx, callback);
         } else {
           throw e;
         }
       }
     }
   }
-  , requireAuthentication: function (callback) {
+  , requireAuth: function (callback) {
     var self = this
     ;
 
     return function *(next) {
       var ctx = this.context || this
+      , token
       ;
 
-      yield self.authenticate(ctx, function *(token) {
-        self._github.authenticate({
-          type: 'oauth'
-          , token: token
-        });
-        ctx.github = self._github;
-        yield callback.call(this, next);
+      token = self.authenticate(ctx);
+      self._github.authenticate({
+        type: 'oauth'
+        , token: token
       });
+      ctx.github = self._github;
+      yield callback.call(this, next);
     };
   }
 };

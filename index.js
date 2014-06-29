@@ -40,7 +40,7 @@ app.get('/', function *(next) {
 app.get('/lgtm', function *(next) {
 });
 
-app.get('/lgtm/create', client.requireAuthentication(function *(next) {
+app.get('/lgtm/create', client.requireAuth(function *(next) {
   var ret
   , req = this.request
   , user = req.query.user
