@@ -28,7 +28,7 @@ function GitHubApiClient(app, options) {
 
   this._app = app;
 
-  this.github = new GitHubApi({
+  this._github = new GitHubApi({
     // required
     version: '3.0.0',
     // optional
@@ -115,12 +115,8 @@ GitHubApiClient.prototype = {
         , state: state
       }));
     } else {
-      this.github.authenticate({
-        type: 'oauth'
-        , token: token
-      });
       try {
-        yield callback.call(ctx, this.github);
+        yield callback.call(ctx, token);
       } catch (e) {
         console.log('An error has occurred on using GitHub API: '
                     + util.inspect(e));
@@ -133,5 +129,23 @@ GitHubApiClient.prototype = {
         }
       }
     }
+  }
+  , requireAuthentication: function (callback) {
+    var self = this
+    ;
+
+    return function *(next) {
+      var ctx = this.context || this
+      ;
+
+      yield self.authenticate(ctx, function *(token) {
+        self._github.authenticate({
+          type: 'oauth'
+          , token: token
+        });
+        ctx.github = self._github;
+        yield callback.call(this, next);
+      });
+    };
   }
 };

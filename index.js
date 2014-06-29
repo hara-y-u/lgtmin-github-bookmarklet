@@ -36,27 +36,29 @@ app.get('/', function *(next) {
   this.body = 'hello';
 });
 
+// TODO
 app.get('/lgtm', function *(next) {
-  yield client.authenticate(this, function *(github){
-    var ret
-    , req = this.request
-    , user = req.query.user
-    , repo = req.query.repo
-    , number = req.query.number
-    , hash = req.query.hash
-    ;
-
-    ret = yield Q.denodeify(github.issues.createComment)({
-      user: user
-      , repo: repo
-      , number: number
-      , body: lgtmMarkdown(hash)
-    }).then(function(comments) {
-      return comments;
-    });
-
-    this.body = util.inspect(ret);
-  });
 });
+
+app.get('/lgtm/create', client.requireAuthentication(function *(next) {
+  var ret
+  , req = this.request
+  , user = req.query.user
+  , repo = req.query.repo
+  , number = req.query.number
+  , hash = req.query.hash
+  ;
+
+  ret = yield Q.denodeify(this.github.issues.createComment)({
+    user: user
+    , repo: repo
+    , number: number
+    , body: lgtmMarkdown(hash)
+  }).then(function(comments) {
+    return comments;
+  });
+
+  this.body = util.inspect(ret);
+}));
 
 app.listen(port);
