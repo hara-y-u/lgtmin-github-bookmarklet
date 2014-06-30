@@ -99,38 +99,21 @@ GitHubApiClient.prototype = {
   , urlToHost: function(ctx) {
     return ctx.request.protocol + '://' + ctx.request.get('host');
   }
-  , authenticate: function(ctx) {
-    var token = this.loadToken(ctx)
-    , csrf = ctx.session.github_api_client_csrf = ctx.csrf
+  , redirectToAuthorizeUrl: function(ctx) {
+    var csrf = ctx.session.github_api_client_csrf = ctx.csrf
     , state = jwt.sign({rfp: csrf}, this._app.keys[0])
     ;
 
     ctx.session.github_api_client_redirect_path
       = ctx.request.originalUrl;
 
-    if (!token) {
-      ctx.response.redirect(this.oauth.getAuthorizeUrl({
-        redirect_uri: this.urlToHost(ctx) + this.callbackPath
-        , scope: 'repo'
-        , state: state
-      }));
-    } else {
-      try {
-        return token;
-      } catch (e) {
-        console.log('An error has occurred on using GitHub API: '
-                    + util.inspect(e));
-        if (e.code == 401) {
-          console.log('Reset Token..')
-          this.saveToken(ctx, null);
-          this.authenticate(ctx, callback);
-        } else {
-          throw e;
-        }
-      }
-    }
+    ctx.response.redirect(this.oauth.getAuthorizeUrl({
+      redirect_uri: this.urlToHost(ctx) + this.callbackPath
+      , scope: 'repo'
+      , state: state
+    }));
   }
-  , requireAuth: function (callback) {
+  , requireAuth: function(body) {
     var self = this
     ;
 
@@ -139,13 +122,27 @@ GitHubApiClient.prototype = {
       , token
       ;
 
-      token = self.authenticate(ctx);
+      token = self.loadToken(ctx);
+      if (!token) { return self.redirectToAuthorizeUrl(ctx); }
       self._github.authenticate({
         type: 'oauth'
         , token: token
       });
       ctx.github = self._github;
-      yield callback.call(this, next);
+
+      try {
+        yield body.call(this, next);
+      } catch (e) {
+        console.log('An error has occurred on using GitHub API: '
+                    + util.inspect(e));
+        if (e.code == 401) {
+          console.log('Reset Token..')
+          self.saveToken(ctx, null);
+          self.redirectToAuthorizeUrl(ctx);
+        } else {
+          throw e;
+        }
+      }
     };
   }
 };
