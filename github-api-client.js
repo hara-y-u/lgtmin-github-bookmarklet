@@ -84,7 +84,7 @@ function GitHubApiClient(app, options) {
     } catch (e) {
       console.log('An error has occurred during retriving access token: '
                   + util.inspect(e));
-      throw e;
+      this.throw(e);
     }
   });
 }
@@ -140,7 +140,7 @@ GitHubApiClient.prototype = {
           self.saveToken(ctx, null);
           self.redirectToAuthorizeUrl(ctx);
         } else {
-          throw e;
+          this.throw(e);
         }
       }
     };
