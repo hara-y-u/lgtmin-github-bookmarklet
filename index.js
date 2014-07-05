@@ -49,35 +49,34 @@ app.get('/', function *(next) {
   this.body = 'hello';
 });
 
+function assertParams(ctx, params, required) {
+  var key, val
+  ;
+  try {
+    if(required.sort().toString()
+       !== Object.keys(params).sort().toString()) {
+      ctx.throw(400, 'Bad Request');
+    }
+  } catch (e) {
+    ctx.throw(400, 'Bad Request');
+  }
+  for(key in params) {
+    val = params[key];
+    if(val == null || val == '') {
+      ctx.throw(400, 'Bad Request');
+    }
+  }
+}
+
 app.get('/lgtm', function *(next) {
   var NUM_LGTMS = 3
-  , REQUIRED_QUERY = ['user', 'repo', 'number']
   , ret
   , lgtmReqs = []
   , lgtms = []
   , i
   ;
 
-  function assertQuery(ctx, query) {
-    var key, val
-    ;
-    try {
-      if(REQUIRED_QUERY.sort().toString()
-         !== Object.keys(query).sort().toString()) {
-        ctx.throw(400, 'Bad Request');
-      }
-    } catch (e) {
-      ctx.throw(400, 'Bad Request');
-    }
-    for(key in query) {
-      val = query[key];
-      if(val == null || val == '') {
-        ctx.throw(400, 'Bad Request');
-      }
-    }
-  }
-
-  assertQuery(this, this.request.query);
+  assertParams(this, this.request.query, ['user', 'repo', 'number']);
 
   for(i = 0; i < NUM_LGTMS; i++) {
     lgtmReqs.push(request({
@@ -103,6 +102,8 @@ app.post('/lgtm/create', client.requireAuth(function *(next) {
   ;
 
   this.assertCsrf(lgtm);
+  delete lgtm._csrf;
+  assertParams(this, lgtm, ['user', 'repo', 'number', 'hash']);
 
   ret = yield Q.denodeify(this.github.issues.createComment)({
     user: lgtm.user
