@@ -12,7 +12,7 @@ var util = require('util')
 , app = koa()
 , csrf = require('koa-csrf')
 , key = process.env.APP_KEY || 'im a secret'
-, Client = require('github-api-client')
+, Client = require('./github-api-client.js')
 , client
 , lgtmMarkdown = function(hash) {
   return '![LGTM](http://www.lgtm.in/p/' + hash + ')';
