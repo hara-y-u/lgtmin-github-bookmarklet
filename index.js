@@ -51,11 +51,33 @@ app.get('/', function *(next) {
 
 app.get('/lgtm', function *(next) {
   var NUM_LGTMS = 3
+  , REQUIRED_QUERY = ['user', 'repo', 'number']
   , ret
   , lgtmReqs = []
   , lgtms = []
   , i
   ;
+
+  function assertQuery(ctx, query) {
+    var key, val
+    ;
+    try {
+      if(REQUIRED_QUERY.sort().toString()
+         !== Object.keys(query).sort().toString()) {
+        ctx.throw(400, 'Bad Request');
+      }
+    } catch (e) {
+      ctx.throw(400, 'Bad Request');
+    }
+    for(key in query) {
+      val = query[key];
+      if(val == null || val == '') {
+        ctx.throw(400, 'Bad Request');
+      }
+    }
+  }
+
+  assertQuery(this, this.request.query);
 
   for(i = 0; i < NUM_LGTMS; i++) {
     lgtmReqs.push(request({
