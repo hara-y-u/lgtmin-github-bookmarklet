@@ -90,7 +90,6 @@ app.get('/lgtm', function *(next) {
 
   ret.forEach(function(_ret) { lgtms.push(_ret[1]); });
 
-  this.session._csrf
   yield this.render('index', {
     lgtms: lgtms
     , query: this.request.query
