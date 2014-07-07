@@ -1,6 +1,7 @@
 'use strict';
 
 var util = require('util')
+, fs = require('fs')
 , koa = require('koa')
 , common = require('koa-common')
 , router = require('koa-router')
@@ -14,6 +15,7 @@ var util = require('util')
 , key = process.env.APP_KEY || 'im a secret'
 , Client = require('./github-api-client.js')
 , client
+, UglifyJs = require('uglify-js')
 , lgtmMarkdown = function(hash) {
   return '![LGTM](http://www.lgtm.in/p/' + hash + ')';
 }
@@ -46,7 +48,18 @@ app.use(router(app));
 client = new Client(app);
 
 app.get('/', function *(next) {
-  this.body = 'hello';
+  var bmltCode = yield Q.denodeify(fs.readFile)(
+    __dirname + '/bookmarklet.js', 'utf8'
+  ).then(function(data) {
+    return 'javascript:' + encodeURIComponent(
+			UglifyJs.minify(data, {fromString: true}).code
+    );
+  })
+  ;
+  
+  yield this.render('index', {
+   bmltCode: bmltCode
+  });
 });
 
 function assertParams(ctx, params, valids) {
