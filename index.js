@@ -89,10 +89,10 @@ app.get('/lgtm', function *(next) {
 
   ret.forEach(function(_ret) { lgtms.push(_ret[1]); });
 
-  yield this.render('index', {
+  yield this.render('lgtm', {
     lgtms: lgtms
     , query: this.request.query
-    , csrfToken: this.csrf
+    , csrf: this.csrf
   });
 });
 

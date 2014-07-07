@@ -2,7 +2,7 @@ ul
   each lgtm in lgtms
     li
       form(method='post' action='/lgtm/create')
-        input(type='hidden' name='_csrf' value=csrfToken)
+        input(type='hidden' name='_csrf' value=csrf)
         input(type='hidden' name='user' value=query.user)
         input(type='hidden' name='repo' value=query.repo)
         input(type='hidden' name='number' value=query.number)
