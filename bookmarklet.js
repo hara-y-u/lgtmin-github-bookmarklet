@@ -3,7 +3,7 @@
 
   var nameRe = '([\-_\.A-z0-9]+)'
   , githubIssueUrlRe = new RegExp('https?://github.com/' + nameRe + '/'
-								                  + nameRe + '/(?:pull|issues)/([0-9]+)')
+                                  + nameRe + '/(?:pull|issues)/([0-9]+)')
   , lgtmUrlTmp = 'http://lgtmin-gh-bmlt.herokuapp.com/lgtm?user=$USER&repo=$REPO&number=$NUMBER'
   , match, user, repo, number
   ;
