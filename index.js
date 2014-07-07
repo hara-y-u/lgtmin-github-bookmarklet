@@ -52,7 +52,7 @@ app.get('/', function *(next) {
     __dirname + '/bookmarklet.js', 'utf8'
   ).then(function(data) {
     return 'javascript:' + encodeURIComponent(
-			UglifyJs.minify(data, {fromString: true}).code
+      UglifyJs.minify(data, {fromString: true}).code
     );
   })
   ;
