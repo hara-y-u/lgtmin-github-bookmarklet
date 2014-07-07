@@ -49,11 +49,11 @@ app.get('/', function *(next) {
   this.body = 'hello';
 });
 
-function assertParams(ctx, params, required) {
+function assertParams(ctx, params, valids) {
   var key, val
   ;
   try {
-    if(required.sort().toString()
+    if(valids.sort().toString()
        !== Object.keys(params).sort().toString()) {
       ctx.throw(400, 'Bad Request');
     }
