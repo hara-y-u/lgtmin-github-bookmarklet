@@ -110,8 +110,8 @@ app.post('/lgtm/create', client.requireAuth(function *(next) {
     , repo: lgtm.repo
     , number: lgtm.number
     , body: lgtmMarkdown(lgtm.hash)
-  }).then(function(comments) {
-    return comments;
+  }).then(function(ret) {
+    return ret;
   });
 
   this.body = util.inspect(ret);
