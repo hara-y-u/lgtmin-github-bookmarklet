@@ -5,6 +5,8 @@ var util = require('util')
 , koa = require('koa')
 , common = require('koa-common')
 , router = require('koa-router')
+, stylus = require('stylus')
+, send = require('koa-send')
 , views = require('co-views')
 , parse = require('co-body')
 , Q = require('q')
@@ -16,15 +18,20 @@ var util = require('util')
 , Client = require('./github-api-client.js')
 , client
 , UglifyJs = require('uglify-js')
+, nib = require('nib')
+, jeet = require('jeet')
 , lgtmMarkdown = function(hash) {
   return '![LGTM](http://www.lgtm.in/p/' + hash + ')';
 }
 ;
 
+// base setup
 app.use(common.logger());
 app.keys = [key];
 app.use(common.session());
 csrf(app);
+
+// views
 app.use(function *(next) {
   var _render = views('views', { default: 'jade' });
   this.render = function (view, locals) {
@@ -43,6 +50,32 @@ app.use(function *(next) {
 
   yield next;
 });
+
+// assets
+app.use(function *(next) {
+  function compile(str, path) {
+    return stylus(str)
+      .set('filename', path)
+      .set('compress', true)
+      .use(nib())
+      .use(jeet());
+  }
+  yield Q.denodeify(stylus.middleware({
+    src: __dirname + '/assets',
+    compile: compile
+  }))(
+    this.req, this.res
+  );
+  yield next;
+});
+
+// serve assets as static
+app.use(function *(next){
+  yield send(this, this.path, { root: __dirname + '/assets' });
+  yield next;
+});
+
+// routes
 app.use(router(app));
 
 client = new Client(app);
