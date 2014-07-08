@@ -82,7 +82,7 @@ client = new Client(app);
 
 app.get('/', function *(next) {
   var bmltCode = yield Q.denodeify(fs.readFile)(
-    __dirname + '/bookmarklet.js', 'utf8'
+    __dirname + '/assets/bookmarklet.js', 'utf8'
   ).then(function(data) {
     return 'javascript:' + encodeURIComponent(
       UglifyJs.minify(data, {fromString: true}).code
