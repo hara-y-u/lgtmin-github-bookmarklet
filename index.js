@@ -23,6 +23,7 @@ var util = require('util')
 , lgtmMarkdown = function(hash) {
   return '![LGTM](http://www.lgtm.in/p/' + hash + ')';
 }
+, TITLE = 'LGTM.in GitHub Bookmarklet'
 ;
 
 // base setup
@@ -40,10 +41,12 @@ app.use(function *(next) {
 
     if (!locals) locals = {};
 
+    locals.title = TITLE;
+
     return function *() {
       this.type = 'text/html';
       body = yield _render(view, locals);
-      html = yield _render('layout', { body: body });
+      html = yield _render('layout', { title: TITLE, body: body });
       this.body = html;
     }
   }
