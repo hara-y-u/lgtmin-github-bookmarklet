@@ -163,7 +163,7 @@ app.post('/lgtm/create', client.requireAuth(function *(next) {
     return ret;
   });
 
-  this.body = util.inspect(ret);
+  yield this.render('lgtm_create');
 }));
 
 app.listen(port);
