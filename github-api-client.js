@@ -113,8 +113,15 @@ GitHubApiClient.prototype = {
       , state: state
     }));
   }
-  , requireAuth: function(body) {
+  , requireAuth: function(body, fallbackPathGen) {
     var self = this
+    , fallback = function *(ctx) {
+      if(fallbackPathGen == null) {
+        self.redirectToAuthorizeUrl(ctx);
+      } else {
+        ctx.redirect(yield fallbackPathGen(ctx));
+      }
+    }
     ;
 
     return function *(next) {
@@ -123,7 +130,7 @@ GitHubApiClient.prototype = {
       ;
 
       token = self.loadToken(ctx);
-      if (!token) { return self.redirectToAuthorizeUrl(ctx); }
+      if (!token) { return yield fallback(ctx); }
       self._github.authenticate({
         type: 'oauth'
         , token: token
@@ -138,7 +145,7 @@ GitHubApiClient.prototype = {
         if (e.code == 401) {
           console.log('Reset Token..')
           self.saveToken(ctx, null);
-          self.redirectToAuthorizeUrl(ctx);
+          yield fallback(ctx);
         } else {
           this.throw(e);
         }

@@ -117,7 +117,7 @@ function assertParams(ctx, params, valids) {
   }
 }
 
-app.get('/lgtm', function *(next) {
+app.get('/lgtm', client.requireAuth(function *(next) {
   var NUM_LGTMS = 3
   , ret
   , lgtmReqs = []
@@ -143,7 +143,7 @@ app.get('/lgtm', function *(next) {
     , query: this.request.query
     , csrf: this.csrf
   });
-});
+}));
 
 app.post('/lgtm/create', client.requireAuth(function *(next) {
   var ret
@@ -164,6 +164,12 @@ app.post('/lgtm/create', client.requireAuth(function *(next) {
   });
 
   yield this.render('lgtm_create');
+}, function *(ctx) {
+  var lgtm = yield parse(ctx)
+  ;
+  return '/lgtm?user=' + lgtm.user + '&repo=' + lgtm.repo
+    + '&number=' + lgtm.number
+    + '&hash=' + lgtm.hash
 }));
 
 app.listen(port);
