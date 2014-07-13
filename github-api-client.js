@@ -145,7 +145,7 @@ GitHubApiClient.prototype = {
         if (e.code == 401) {
           console.log('Reset Token..')
           self.saveToken(ctx, null);
-          yield fallback(ctx);
+          return yield fallback(ctx);
         } else {
           this.throw(e);
         }
