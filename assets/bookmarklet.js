@@ -1,6 +1,6 @@
-!(function (window, undefined) {
-  'use strict';
+'use strict';
 
+function main() {
   var nameRe = '([\-_\.A-z0-9]+)'
   , githubIssueUrlRe = new RegExp('^https?://github.com/' + nameRe + '/'
                                   + nameRe + '/(?:pull|issues)/([0-9]+)')
@@ -9,7 +9,7 @@
   , match, user, repo, number
   ;
 
-  match = location.href.match(githubIssueUrlRe);
+  match = window.location.href.match(githubIssueUrlRe);
 
   if(!match || !match[1] || !match[2] || !match[3]) {
     if(location.href.indexOf(homeUrl) == 0) {
@@ -27,4 +27,6 @@
               .replace('$REPO', repo)
               .replace('$NUMBER', number)
              ).focus();
-})(window);
+}
+
+main();

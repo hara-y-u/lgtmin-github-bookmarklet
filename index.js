@@ -87,9 +87,10 @@ app.get('/', function *(next) {
   var bmltCode = yield Q.denodeify(fs.readFile)(
     __dirname + '/assets/bookmarklet.js', 'utf8'
   ).then(function(data) {
-    return 'javascript:' + encodeURIComponent(
-      UglifyJs.minify(data, {fromString: true}).code
-    );
+    return 'javascript:(function(window,undefined) {'
+      + encodeURIComponent(UglifyJs.minify(data, {fromString: true}).code)
+      + '})(window);'
+    ;
   })
   ;
   
