@@ -145,7 +145,7 @@ app.get('/lgtm', client.requireAuth(function *(next) {
   });
 }));
 
-app.post('/lgtm/create', client.requireAuth(function *(next) {
+app.post('/lgtm', client.requireAuth(function *(next) {
   var ret
   , lgtm = yield parse(this)
   ;
