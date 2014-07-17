@@ -1,2 +1,10 @@
 article.container.lgtm_create
-  p. Success!
+  h2. Success!
+  p. This window will be closed..
+
+script(type='text/javascript').
+  $(function(ev) {
+    setTimeout(function(ev) {
+      window.open('about:blank', '_self').close();
+    }, 3000);
+  });
