@@ -4,13 +4,17 @@
 global-reset()
 reset-html5()
 
-// reset button style
+// custom reset
 button
   appearance none
   border none
   padding 0
   margin 0
   background-color transparent
+
+a
+  color: inherit
+  text-decoration: none
 
 // vars
 black = #222
@@ -31,6 +35,7 @@ body
   font-family sans-serif
   font-smoothing subpixel-antialiased
   background-color white-bg
+  letter-spacing 0.05em
 
 .container
   max-width container-max-width
