@@ -150,6 +150,8 @@ app.post('/lgtm/create', client.requireAuth(function *(next) {
   , lgtm = yield parse(this)
   ;
 
+  this._lgtm = lgtm;
+
   this.assertCsrf(lgtm);
   delete lgtm._csrf;
   assertParams(this, lgtm, ['user', 'repo', 'number', 'hash']);
@@ -164,12 +166,14 @@ app.post('/lgtm/create', client.requireAuth(function *(next) {
   });
 
   yield this.render('lgtm_create');
-}, function *(ctx) {
-  var lgtm = yield parse(ctx)
+}, function *() {
+  var lgtm = this._lgtm
   ;
-  return '/lgtm?user=' + lgtm.user + '&repo=' + lgtm.repo
+
+  return '/lgtm?user=' + lgtm.user
+    + '&repo=' + lgtm.repo
     + '&number=' + lgtm.number
-    + '&hash=' + lgtm.hash
+  ;
 }));
 
 app.listen(port);

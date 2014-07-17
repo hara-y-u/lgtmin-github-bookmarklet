@@ -115,13 +115,6 @@ GitHubApiClient.prototype = {
   }
   , requireAuth: function(body, fallbackPathGen) {
     var self = this
-    , fallback = function *(ctx) {
-      if(fallbackPathGen == null) {
-        self.redirectToAuthorizeUrl(ctx);
-      } else {
-        ctx.redirect(yield fallbackPathGen(ctx));
-      }
-    }
     ;
 
     return function *(next) {
@@ -129,8 +122,16 @@ GitHubApiClient.prototype = {
       , token
       ;
 
+      function *fallback() {
+        if(fallbackPathGen == null) {
+          self.redirectToAuthorizeUrl(ctx);
+        } else {
+          ctx.redirect(yield fallbackPathGen.call(ctx));
+        }
+      }
+
       token = self.loadToken(ctx);
-      if (!token) { return yield fallback(ctx); }
+      if (!token) { return yield fallback(); }
       self._github.authenticate({
         type: 'oauth'
         , token: token
@@ -145,7 +146,7 @@ GitHubApiClient.prototype = {
         if (e.code == 401) {
           console.log('Reset Token..')
           self.saveToken(ctx, null);
-          return yield fallback(ctx);
+          return yield fallback();
         } else {
           this.throw(e);
         }
