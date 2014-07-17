@@ -2,7 +2,7 @@
   'use strict';
 
   var nameRe = '([\-_\.A-z0-9]+)'
-  , githubIssueUrlRe = new RegExp('https?://github.com/' + nameRe + '/'
+  , githubIssueUrlRe = new RegExp('^https?://github.com/' + nameRe + '/'
                                   + nameRe + '/(?:pull|issues)/([0-9]+)')
   , homeUrl = 'http://lgtmin-gh-bmlt.herokuapp.com'
   , lgtmUrlTemplate = homeUrl + '/lgtm?user=$USER&repo=$REPO&number=$NUMBER'
