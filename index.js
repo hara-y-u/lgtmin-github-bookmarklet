@@ -21,7 +21,10 @@ var util = require('util')
 , nib = require('nib')
 , jeet = require('jeet')
 , lgtmMarkdown = function(hash) {
-  return '![LGTM](http://www.lgtm.in/p/' + hash + ')';
+  return '[![LGTM](http://www.lgtm.in/p/' + hash + ')]'
+    + '(http://www.lgtm.in/i/' + hash + ')'
+    + '\n\n[:+1:](http://www.lgtm.in/u/' + hash + ')'
+    + '[:-1:](http://www.lgtm.in/r/' + hash + ')'
 }
 , TITLE = 'LGTM.in GitHub Bookmarklet'
 ;
