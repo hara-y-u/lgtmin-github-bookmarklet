@@ -1,6 +1,32 @@
 'use strict';
 
 (function (window, undefined){
+  function isMobile() {
+    if(navigator.userAgent.match(/Android/i)
+       || navigator.userAgent.match(/webOS/i)
+       || navigator.userAgent.match(/iPhone/i)
+       || navigator.userAgent.match(/iPad/i)
+       || navigator.userAgent.match(/iPod/i)
+       || navigator.userAgent.match(/BlackBerry/i)
+       || navigator.userAgent.match(/Windows Phone/i)
+      ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  function onWindowClosed(window, fn) {
+    var timer
+    ;
+    timer = setInterval(function() {
+      if(window.closed) {
+        clearInterval(timer);
+        fn(window);
+      }
+    }, 500);
+  }
+
   var nameRe = '([\-_\.A-z0-9]+)'
   , githubIssueUrlRe = new RegExp('^https?://github.com/' + nameRe + '/'
                                   + nameRe + '/(?:pull|issues)/([0-9]+)')
@@ -8,6 +34,7 @@
   , lgtmUrlTemplate = homeUrl + '/lgtm?user=$USER&repo=$REPO&number=$NUMBER'
   , match, user, repo, number
   , lgtmWin, timer
+  , isMobile = isMobile()
   ;
 
   match = window.location.href.match(githubIssueUrlRe);
@@ -29,4 +56,10 @@
                         .replace('$NUMBER', number)
                        );
   lgtmWin.focus();
+
+  if(isMobile) {
+    onWindowClosed(lgtmWin, function(_win) {
+      window.location.reload();
+    });
+  }
 })(window);
