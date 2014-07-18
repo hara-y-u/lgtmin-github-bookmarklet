@@ -84,7 +84,9 @@ app.use(function *(next){
 // routes
 app.use(router(app));
 
-client = new Client(app);
+client = new Client(app, {
+  scope: 'user repo'
+});
 
 app.get('/', function *(next) {
   var bmltCode = yield Q.denodeify(fs.readFile)(
@@ -121,16 +123,23 @@ function assertParams(ctx, params, valids) {
   }
 }
 
+app.get('/out', function* (next) {
+  client.saveToken(this, null);
+  this.redirect('back');
+});
+
 app.get('/lgtm', client.requireAuth(function *(next) {
   var NUM_LGTMS = 3
   , ret
   , lgtmReqs = []
   , lgtms = []
   , i
+  , loginUser
   ;
 
   assertParams(this, this.request.query, ['user', 'repo', 'number']);
 
+  // LGTMs
   for(i = 0; i < NUM_LGTMS; i++) {
     lgtmReqs.push(request({
       json: true
@@ -142,10 +151,17 @@ app.get('/lgtm', client.requireAuth(function *(next) {
 
   ret.forEach(function(_ret) { lgtms.push(_ret[1]); });
 
+  // github login user
+  loginUser = yield Q.denodeify(this.github.user.get)({})
+    .then(function(ret) {
+      return ret;
+    });
+
   yield this.render('lgtm', {
     lgtms: lgtms
     , query: this.request.query
     , csrf: this.csrf
+    , user: loginUser
   });
 }));
 

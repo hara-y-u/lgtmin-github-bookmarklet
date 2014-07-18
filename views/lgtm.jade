@@ -1,4 +1,9 @@
 article.container.lgtm
+  .user
+    span.pre. Posting as
+    img.avatar(src=user.avatar_url)
+    span.login= user.login
+    a.logout(href='/out'). Update to GitHub login.
   ul
     each lgtm in lgtms
       li

@@ -25,6 +25,8 @@ function GitHubApiClient(app, options) {
   ;
 
   options = options || {};
+  options.scope = options.scope || 'repo';
+  this.options = options;
 
   this._app = app;
 
@@ -107,7 +109,7 @@ GitHubApiClient.prototype = {
 
     ctx.response.redirect(this.oauth.getAuthorizeUrl({
       redirect_uri: this.urlToHost(ctx) + this.callbackPath
-      , scope: 'repo'
+      , scope: this.options.scope
       , state: state
     }));
   }
