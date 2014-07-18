@@ -174,13 +174,13 @@ app.post('/lgtm', client.requireAuth(function *(next) {
 
   this.assertCsrf(lgtm);
   delete lgtm._csrf;
-  assertParams(this, lgtm, ['user', 'repo', 'number', 'hash']);
+  assertParams(this, lgtm, ['text', 'user', 'repo', 'number', 'hash']);
 
   ret = yield Q.denodeify(this.github.issues.createComment)({
     user: lgtm.user
     , repo: lgtm.repo
     , number: lgtm.number
-    , body: lgtmMarkdown(lgtm.hash)
+    , body: lgtm.text + '\n\n' + lgtmMarkdown(lgtm.hash)
   }).then(function(ret) {
     return ret;
   });

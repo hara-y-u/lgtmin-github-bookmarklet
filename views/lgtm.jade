@@ -4,14 +4,25 @@ article.container.lgtm
     img.avatar(src=user.avatar_url)
     span.login= user.login
     a.logout(href='/out'). Update to GitHub login.
+  .text
+    textarea(placeholder='Additional text here..', data-persist='garlic'). LGTM!
   ul
     each lgtm in lgtms
       li
-        form(method='post' action='/lgtm')
-          input(type='hidden' name='_csrf' value=csrf)
-          input(type='hidden' name='user' value=query.user)
-          input(type='hidden' name='repo' value=query.repo)
-          input(type='hidden' name='number' value=query.number)
-          input(type='hidden' name='hash' value=lgtm.hash)
-          button(type='submit')
+        form.lgtm-form(method='post' action='/lgtm')
+          input.lgtm-form__item(type='hidden' name='_csrf' value=csrf)
+          input.lgtm-form__item.is-text(type='hidden' name='text')
+          input.lgtm-form__item(type='hidden' name='user' value=query.user)
+          input.lgtm-form__item(type='hidden' name='repo' value=query.repo)
+          input.lgtm-form__item(type='hidden' name='number' value=query.number)
+          input.lgtm-form__item(type='hidden' name='hash' value=lgtm.hash)
+          button.lgtm-form__item(type='submit')
             img(src=lgtm.actualImageUrl)
+
+script(type='text/javascript').
+  $(function(ev) {
+    var $text = $('.text textarea');
+    $('.lgtm-form').on('submit', function(ev) {
+      $('.lgtm-form__item.is-text').val($text.val());
+    });
+  });

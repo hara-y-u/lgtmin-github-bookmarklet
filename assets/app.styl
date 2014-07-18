@@ -16,10 +16,19 @@ a
   color: inherit
   text-decoration: none
 
+textarea
+  appearance none
+  border none
+  margin 0
+  padding 0
+textarea:focus
+  outline: none !important
+
 // vars
 black = #222
 gray = #666
 gray-light = #999
+gray-lighter = #ccc
 // yellow = #FDDB21
 yellow = #FDF100
 yellow-bg = #FDF100
@@ -28,6 +37,16 @@ blue-bg = #B9E7F1
 red-bg = #ff7f7f
 
 container-max-width = 500px
+
+// functions
+calc()
+  if current-property
+    for prefix in vendors
+      arguments = unquote(arguments)
+      add-property(current-property[0], s('-%s-calc(%s)-', prefix, arguments))
+    s('calc(%s)', arguments)
+  else
+    error('calc() must be used within a property')
 
 // global
 @font-face
