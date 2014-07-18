@@ -28,14 +28,12 @@ function GitHubApiClient(app, options) {
 
   this._app = app;
 
-  this._github = new GitHubApi({
-    // required
+  this.gitHubApiOptions = {
     version: '3.0.0',
-    // optional
     debug: 'development' == process.env.NODE_ENV,
     protocol: 'https',
     timeout: 5000
-  });
+  };
 
   this.oauth = new OAuth2(AUTH.clientId
                           , AUTH.clientSecret
@@ -119,8 +117,10 @@ GitHubApiClient.prototype = {
 
     return function *(next) {
       var ctx = this.context || this
-      , token
+      , token, github
       ;
+
+      github = new GitHubApi(self.gitHubApiOptions);
 
       function *fallback() {
         if(fallbackPathGen == null) {
@@ -132,11 +132,11 @@ GitHubApiClient.prototype = {
 
       token = self.loadToken(ctx);
       if (!token) { return yield fallback(); }
-      self._github.authenticate({
+      github.authenticate({
         type: 'oauth'
         , token: token
       });
-      ctx.github = self._github;
+      ctx.github = github;
 
       try {
         yield body.call(this, next);
