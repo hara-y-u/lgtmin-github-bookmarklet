@@ -1,11 +1,14 @@
 LGTM.in GitHub Bookmarklet
 ==========================
 
-Bookmarklet to LGTM on GitHub. Many browsers are supported!
+Bookmarklet to post LGTM on GitHub issues. Many browsers are supported!
 
-* ✔ Safari (OSX)
-* ✔ Sarari (iOS)
-* ✔ Chrome
-* ✔ Opera
+![Screen Shot](./assets/screen.png)
+
+### Confirmed Browsers
+
+* ✔ Sarari (Mac, iOS)
+* ✔ Chrome (Mac)
+* ✔ Opera (Mac)
 * × Firefox (due to CSP issue: https://bugzilla.mozilla.org/show_bug.cgi?id=866522)
 
