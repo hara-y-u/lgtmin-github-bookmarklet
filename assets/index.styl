@@ -1,7 +1,39 @@
 .container.index
   text-align center
   .instruction
-    margin-top 200px
+    .arrow-up
+      height = 200px
+      color = gray-light
+      border-param = dotted 2px color
+      text-align center
+      height height
+      margin 10px 0 5px
+      position relative
+      div
+        display inline-block
+        position absolute
+      &__point
+        transform rotate(45deg)
+        width 30px
+        height 30px
+        border-top border-param
+        border-left border-param
+        top 5px
+        left 47%
+        overflow visible
+      &__line
+        width 0px
+        height height
+        border-right border-param
+    .tip
+      position absolute
+      left 53%
+      top 110px
+      padding 2px 4px
+      border-bottom solid 2px yellow
+    &:hover
+      .tip
+        transform rotate(-10deg)
     a
       text-decoration none
       display inline-block
