@@ -16,13 +16,15 @@ article.container.lgtm
           input.lgtm-form__item(type='hidden' name='repo' value=query.repo)
           input.lgtm-form__item(type='hidden' name='number' value=query.number)
           input.lgtm-form__item(type='hidden' name='hash' value=lgtm.hash)
-          button.lgtm-form__item(type='submit')
+          button.lgtm-form__item.is-submit(type='submit')
             img(src=lgtm.actualImageUrl)
 
 script(type='text/javascript').
   $(function(ev) {
-    var $text = $('.text textarea');
+    var $text = $('.text textarea')
+        , $submits = $('.lgtm-form__item.is-submit');
     $('.lgtm-form').on('submit', function(ev) {
+      $submits.attr('disabled', true);
       $('.lgtm-form__item.is-text').val($text.val());
     });
   });
