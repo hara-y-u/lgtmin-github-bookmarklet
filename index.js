@@ -135,15 +135,27 @@ app.get('/lgtm', client.requireAuth(function *(next) {
   , lgtms = []
   , i
   , loginUser
+  , query = this.request.query
+  , isMylist = (query.mylist === 'true')
+  , lgtmUrl
+  , randomPath, mylistPath
   ;
 
-  assertParams(this, this.request.query, ['user', 'repo', 'number']);
+  delete query.mylist;
+
+  assertParams(this, query, ['user', 'repo', 'number']);
+
+  // github login user
+  loginUser = yield Q.denodeify(this.github.user.get)({})
+    .then(function(ret) { return ret; });
 
   // LGTMs
+  lgtmUrl = 'http://www.lgtm.in/g' + (isMylist ? '/' + loginUser.login : '');
+
   for(i = 0; i < NUM_LGTMS; i++) {
     lgtmReqs.push(request({
       json: true
-      , url: 'http://www.lgtm.in/g'
+      , url: lgtmUrl
     }));
   }
 
@@ -151,17 +163,18 @@ app.get('/lgtm', client.requireAuth(function *(next) {
 
   ret.forEach(function(_ret) { lgtms.push(_ret[1]); });
 
-  // github login user
-  loginUser = yield Q.denodeify(this.github.user.get)({})
-    .then(function(ret) {
-      return ret;
-    });
+  // Paths
+  randomPath = this.request.url.replace('&mylist=true', '');
+  mylistPath = this.request.url + '&mylist=true';
 
   yield this.render('lgtm', {
     lgtms: lgtms
-    , query: this.request.query
+    , query: query
     , csrf: this.csrf
     , user: loginUser
+    , isMylist: isMylist
+    , randomPath: randomPath
+    , mylistPath: mylistPath
   });
 }));
 

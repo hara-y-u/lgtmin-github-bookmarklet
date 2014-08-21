@@ -4,8 +4,18 @@ article.container.lgtm
     img.avatar(src=user.avatar_url)
     span.login= user.login
     a.logout(href='/out'). Update to GitHub login.
+  .mode
+    if isMylist
+      a.mode__random(href=randomPath). Random
+      span.mode__mylist.is-selected. My List
+    else
+      span.mode__random.is-selected. Random
+      a.mode__mylist(href=mylistPath). My List
   .text
     textarea(placeholder='Additional text here..', data-persist='garlic'). LGTM!
+  if isMylist
+    .browse-link
+      a(href='http://www.lgtm.in/browse' target='_blank'). Add more to My List.
   ul
     each lgtm in lgtms
       li
