@@ -20,7 +20,7 @@ var util = require('util')
 , UglifyJs = require('uglify-js')
 , nib = require('nib')
 , jeet = require('jeet')
-, browserify = require('koa-browserify')
+, browserify = require('./browserify-middleware')
 , reactify = require('reactify')
 , lgtmMarkdown = function(hash) {
   return '[![LGTM](http://www.lgtm.in/p/' + hash + ')]'
