@@ -32,9 +32,13 @@ var LGTMSubmitImage = React.createClass({
       });
   }
   , componentDidMount: function() {
-    var self = this;
+    var self = this
+    , $el = $(self.getDOMNode());
     $(window).on('lgtm:text-change', function(ev, text) {
       $(self.refs.text.getDOMNode()).val(text);
+    });
+    $el.on('submit', function(ev) {
+      $el.find('.is-submit').attr('disabled', true);
     });
   }
   , componentWillUnmount: function() {
@@ -62,7 +66,7 @@ var LGTMSubmitImage = React.createClass({
                name='number' value={this.props.number} />
         <input className='lgtm-form__item' type='hidden'
                name='hash' value={this.state.lgtm.hash} />
-        <button className='lgtm-form__item.is-submit' typo='submit'>
+        <button className='lgtm-form__item is-submit' typo='submit'>
           <img src={this.state.lgtm.actualImageUrl} />
         </button>
       </form>
@@ -171,11 +175,17 @@ var ModeSelector = React.createClass({
         {(this.state.mode === 'random') ?
           <div>
             <span className='mode__random is-selected'>Random</span>
-            <a className='mode__mylist' onClick={this.modeToMyList}>My List</a>
+            <a className='mode__mylist' onClick={this.modeToMyList}
+               href='javascript:void(0);'>
+              My List
+            </a>
           </div>
           :
           <div>
-            <a className='mode__random' onClick={this.modeToRandom}>Random</a>
+            <a className='mode__random' onClick={this.modeToRandom}
+               href='javascript:void(0);'>
+              Random
+            </a>
             <span className='mode__mylist is-selected'>My List</span>
           </div>
         }

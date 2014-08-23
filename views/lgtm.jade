@@ -7,12 +7,3 @@ article.container.lgtm
   #lgtm-form(data-csrf=csrf data-login-user=user.login)
 
 script(src='lgtm.js')
-script(type='text/javascript').
-  $(function(ev) {
-    var $text = $('.text textarea')
-        , $submits = $('.lgtm-form__item.is-submit');
-    $('.lgtm-form').on('submit', function(ev) {
-      $submits.attr('disabled', true);
-      $('.lgtm-form__item.is-text').val($text.val());
-    });
-  });
