@@ -20,7 +20,7 @@ var util = require('util')
 , UglifyJs = require('uglify-js')
 , nib = require('nib')
 , jeet = require('jeet')
-, browserify = require('koa-browserify')
+, browserify = require('./browserify-middleware')
 , reactify = require('reactify')
 , lgtmMarkdown = function(hash) {
   return '[![LGTM](http://www.lgtm.in/p/' + hash + ')]'
@@ -59,13 +59,14 @@ app.use(function *(next) {
   yield next;
 });
 
-
 // assets
 // browserify
-app.use(browserify({
-  root: __dirname + '/assets/browserify'
-  , transform: reactify
-}));
+if (process.env.NODE_ENV != 'production') {
+  app.use(browserify({
+    root: __dirname + '/assets/browserify'
+    , transform: reactify
+  }));
+}
 
 // stylus
 app.use(function *(next) {
@@ -134,22 +135,25 @@ function assertParams(ctx, params, valids) {
 }
 
 app.get('/out', function* (next) {
+  this.session.github_login_user = null;
   client.saveToken(this, null);
   this.redirect('back');
 });
 
 app.get('/lgtm', client.requireAuth(function *(next) {
   var NUM_LGTMS = 3
-  , loginUser
   ;
 
-  // github login user
-  loginUser = yield Q.denodeify(this.github.user.get)({})
-    .then(function(ret) { return ret; });
+  // cache
+  if (!this.session.github_login_user) {
+    this.session.github_login_user
+      = yield Q.denodeify(this.github.user.get)({})
+      .then(function(ret) { return ret; });
+  }
 
   yield this.render('lgtm', {
     csrf: this.csrf
-    , user: loginUser
+    , user: this.session.github_login_user
   });
 }));
 
