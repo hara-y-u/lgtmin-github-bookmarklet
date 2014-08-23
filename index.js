@@ -59,13 +59,14 @@ app.use(function *(next) {
   yield next;
 });
 
-
 // assets
 // browserify
-app.use(browserify({
-  root: __dirname + '/assets/browserify'
-  , transform: reactify
-}));
+if (process.env.NODE_ENV != 'production') {
+  app.use(browserify({
+    root: __dirname + '/assets/browserify'
+    , transform: reactify
+  }));
+}
 
 // stylus
 app.use(function *(next) {
