@@ -86,20 +86,30 @@ var LGTMSubmitImageList = React.createClass({
   , render: function() {
     var self = this;
     return (
-      <ul data-mode={this.props.mode}>
-      {this.state.indexes.map(function(idx) {
-        return (
-          <li key={idx}>
-            <LGTMSubmitImage user={query.user} repo={query.repo}
-                             number={query.number}
-                             csrf={self.props.csrf}
-                             loginUser={self.props.loginUser}
-                             mode={self.state.mode}
-                             requestId={idx} />
-          </li>
-        );
-      })}
-      </ul>
+      <div>
+        { (self.state.mode == 'mylist') ? (
+            <div className='browse-link'>
+              <a href='http://www.lgtm.in/browse' target='_blank'>
+                 Add more to My List.
+               </a>
+            </div>
+          )
+         : <div></div> }
+        <ul data-mode={this.props.mode}>
+        {this.state.indexes.map(function(idx) {
+          return (
+            <li key={idx}>
+              <LGTMSubmitImage user={query.user} repo={query.repo}
+                               number={query.number}
+                               csrf={self.props.csrf}
+                               loginUser={self.props.loginUser}
+                               mode={self.state.mode}
+                               requestId={idx} />
+            </li>
+          );
+        })}
+        </ul>
+      </div>
     );
   }
 });
