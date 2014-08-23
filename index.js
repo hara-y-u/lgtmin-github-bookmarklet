@@ -20,6 +20,8 @@ var util = require('util')
 , UglifyJs = require('uglify-js')
 , nib = require('nib')
 , jeet = require('jeet')
+, browserify = require('koa-browserify')
+, reactify = require('reactify')
 , lgtmMarkdown = function(hash) {
   return '[![LGTM](http://www.lgtm.in/p/' + hash + ')]'
     + '(http://www.lgtm.in/i/' + hash + ')'
@@ -57,7 +59,15 @@ app.use(function *(next) {
   yield next;
 });
 
+
 // assets
+// browserify
+app.use(browserify({
+  root: __dirname + '/assets/browserify'
+  , transform: reactify
+}));
+
+// stylus
 app.use(function *(next) {
   function compile(str, path) {
     return stylus(str)
@@ -130,51 +140,16 @@ app.get('/out', function* (next) {
 
 app.get('/lgtm', client.requireAuth(function *(next) {
   var NUM_LGTMS = 3
-  , ret
-  , lgtmReqs = []
-  , lgtms = []
-  , i
   , loginUser
-  , query = this.request.query
-  , isMylist = (query.mylist === 'true')
-  , lgtmUrl
-  , randomPath, mylistPath
   ;
-
-  delete query.mylist;
-
-  assertParams(this, query, ['user', 'repo', 'number']);
 
   // github login user
   loginUser = yield Q.denodeify(this.github.user.get)({})
     .then(function(ret) { return ret; });
 
-  // LGTMs
-  lgtmUrl = 'http://www.lgtm.in/g' + (isMylist ? '/' + loginUser.login : '');
-
-  for(i = 0; i < NUM_LGTMS; i++) {
-    lgtmReqs.push(request({
-      json: true
-      , url: lgtmUrl
-    }));
-  }
-
-  ret = yield lgtmReqs;
-
-  ret.forEach(function(_ret) { lgtms.push(_ret[1]); });
-
-  // Paths
-  randomPath = this.request.url.replace('&mylist=true', '');
-  mylistPath = this.request.url + '&mylist=true';
-
   yield this.render('lgtm', {
-    lgtms: lgtms
-    , query: query
-    , csrf: this.csrf
+    csrf: this.csrf
     , user: loginUser
-    , isMylist: isMylist
-    , randomPath: randomPath
-    , mylistPath: mylistPath
   });
 }));
 

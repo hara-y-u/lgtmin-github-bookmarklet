@@ -4,37 +4,6 @@ article.container.lgtm
     img.avatar(src=user.avatar_url)
     span.login= user.login
     a.logout(href='/out'). Update to GitHub login.
-  .mode
-    if isMylist
-      a.mode__random(href=randomPath). Random
-      span.mode__mylist.is-selected. My List
-    else
-      span.mode__random.is-selected. Random
-      a.mode__mylist(href=mylistPath). My List
-  .text
-    textarea(placeholder='Additional text here..', data-persist='garlic'). LGTM!
-  if isMylist
-    .browse-link
-      a(href='http://www.lgtm.in/browse' target='_blank'). Add more to My List.
-  ul
-    each lgtm in lgtms
-      li
-        form.lgtm-form(method='post' action='/lgtm')
-          input.lgtm-form__item(type='hidden' name='_csrf' value=csrf)
-          input.lgtm-form__item.is-text(type='hidden' name='text')
-          input.lgtm-form__item(type='hidden' name='user' value=query.user)
-          input.lgtm-form__item(type='hidden' name='repo' value=query.repo)
-          input.lgtm-form__item(type='hidden' name='number' value=query.number)
-          input.lgtm-form__item(type='hidden' name='hash' value=lgtm.hash)
-          button.lgtm-form__item.is-submit(type='submit')
-            img(src=lgtm.actualImageUrl)
+  #lgtm-form(data-csrf=csrf data-login-user=user.login)
 
-script(type='text/javascript').
-  $(function(ev) {
-    var $text = $('.text textarea')
-        , $submits = $('.lgtm-form__item.is-submit');
-    $('.lgtm-form').on('submit', function(ev) {
-      $submits.attr('disabled', true);
-      $('.lgtm-form__item.is-text').val($text.val());
-    });
-  });
+script(src='lgtm.js')
