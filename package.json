@@ -41,7 +41,8 @@
     "store": "*",
     "browserify": "4.1.5",
     "gulp": "*",
-    "gulp-browserify": "*"
+    "gulp-browserify": "*",
+    "gulp-uglify": "*"
   },
   "devDependencies": {
     "boomlet": "~1.0.0"

@@ -1,6 +1,7 @@
 var gulp = require('gulp')
 , browserify = require('gulp-browserify')
 , reactify = require('reactify')
+, uglify = require('gulp-uglify')
 ;
 
 gulp.task('default', function() {
@@ -9,5 +10,6 @@ gulp.task('default', function() {
     .pipe(browserify({
       transform: [reactify]
     }))
+    .pipe(uglify())
     .pipe(gulp.dest('./assets'))
 });
