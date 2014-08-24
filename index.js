@@ -2,11 +2,12 @@
 
 var util = require('util')
 , fs = require('fs')
+, path = require('path')
 , koa = require('koa')
 , common = require('koa-common')
 , router = require('koa-router')
 , stylus = require('stylus')
-, send = require('koa-send')
+, staticCache = require('koa-static-cache')
 , views = require('co-views')
 , parse = require('co-body')
 , Q = require('q')
@@ -60,37 +61,37 @@ app.use(function *(next) {
 });
 
 // assets
-// browserify
 if (process.env.NODE_ENV != 'production') {
+  // browserify dynamically only on development
   app.use(browserify({
-    root: __dirname + '/assets/browserify'
+    root: __dirname + '/assets/src/browserify'
     , transform: reactify
   }));
+  // stylus
+  app.use(function *(next) {
+    function compile(str, path) {
+      return stylus(str)
+        .set('filename', path)
+        .set('compress', true)
+        .use(nib())
+        .use(jeet());
+    }
+
+    yield Q.denodeify(stylus.middleware({
+      src: path.join(__dirname, '/assets/src'),
+      dest: path.join(__dirname, '/assets'),
+      compile: compile
+    }))(this.req, this.res);
+
+    yield next;
+  });
 }
-
-// stylus
-app.use(function *(next) {
-  function compile(str, path) {
-    return stylus(str)
-      .set('filename', path)
-      .set('compress', true)
-      .use(nib())
-      .use(jeet());
-  }
-  yield Q.denodeify(stylus.middleware({
-    src: __dirname + '/assets',
-    compile: compile
-  }))(
-    this.req, this.res
-  );
-  yield next;
-});
-
-// serve assets as static
-app.use(function *(next){
-  yield send(this, this.path, { root: __dirname + '/assets' });
-  yield next;
-});
+// static
+app.use(staticCache(path.join(__dirname, 'assets'), {
+  maxAge: 30 * 24 * 60 * 60
+  , buffer: true
+  , gzip: true
+}));
 
 // routes
 app.use(router(app));
@@ -101,7 +102,7 @@ client = new Client(app, {
 
 app.get('/', function *(next) {
   var bmltCode = yield Q.denodeify(fs.readFile)(
-    __dirname + '/assets/bookmarklet.js', 'utf8'
+    __dirname + '/assets/src/bookmarklet.js', 'utf8'
   ).then(function(data) {
     return 'javascript:(function(window,undefined) {'
       + encodeURIComponent(UglifyJs.minify(data, {fromString: true}).code)
