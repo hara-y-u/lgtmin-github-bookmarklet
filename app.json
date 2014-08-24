@@ -1,0 +1,7 @@
+{
+  "name": "LGTM.in GitHub Bookmarklet",
+  "description": "Post LGTM on GitHub issues/pull requests with ease.",
+  "repository": "https://github.com/yukihr/lgtmin-github-bookmarklet",
+  "logo": "https://raw.githubusercontent.com/yukihr/lgtmin-github-bookmarklet/master/assets/logo.png",
+  "keywords": ["LGTM", "GitHub", "node", "koa"]
+}
