@@ -30,7 +30,7 @@
   var nameRe = '([\-_\.A-z0-9]+)'
   , githubIssueUrlRe = new RegExp('^https?://github.com/' + nameRe + '/'
                                   + nameRe + '/(?:pull|issues)/([0-9]+)')
-  , homeUrl = 'http://lgtmin-gh-bmlt.herokuapp.com'
+  , homeUrl = '{BASE_URL}'
   , lgtmUrlTemplate = homeUrl + '/lgtm?user=$USER&repo=$REPO&number=$NUMBER'
   , match, user, repo, number
   , lgtmWin, timer

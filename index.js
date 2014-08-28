@@ -101,9 +101,12 @@ client = new Client(app, {
 });
 
 app.get('/', function *(next) {
-  var bmltCode = yield Q.denodeify(fs.readFile)(
+  var req = this.request
+  , bmltCode = yield Q.denodeify(fs.readFile)(
     __dirname + '/assets/src/bookmarklet.js', 'utf8'
   ).then(function(data) {
+    var baseUrl = req.protocol + '://' + req.get('host');
+    data = data.replace('{BASE_URL}', baseUrl);
     return 'javascript:(function(window,undefined) {'
       + encodeURIComponent(UglifyJs.minify(data, {fromString: true}).code)
       + '})(window);'
