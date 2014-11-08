@@ -3,5 +3,11 @@
   "description": "Post LGTM on GitHub issues/pull requests with ease.",
   "repository": "https://github.com/yukihr/lgtmin-github-bookmarklet",
   "logo": "https://raw.githubusercontent.com/yukihr/lgtmin-github-bookmarklet/master/assets/logo.png",
-  "keywords": ["LGTM", "GitHub", "node", "koa"]
+  "keywords": ["LGTM", "GitHub", "node", "koa"],
+  "env": {
+    "NODE_ENV": "production",
+    "APP_KEYS": "replace-to-your-arbitrary-secret-key",
+    "GITHUB_API_CLIENT_ID": "{GitHub Api client ID for your app}",
+    "GITHUB_API_CLIENT_SECRET": "{GitHub Api client Secret for your app}"
+  }
 }
