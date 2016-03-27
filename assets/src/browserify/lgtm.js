@@ -1,6 +1,7 @@
 /** @jsx React.DOM */
 
 var React = require('react')
+, ReactDOM = require('react-dom')
 , url = require('url')
 , parsedUrl = url.parse(location.href, true)
 , query = parsedUrl.query
@@ -33,9 +34,9 @@ var LGTMSubmitImage = React.createClass({
   }
   , componentDidMount: function() {
     var self = this
-    , $el = $(self.getDOMNode());
+    , $el = $(ReactDOM.findDOMNode(self));
     $(window).on('lgtm:text-change', function(ev, text) {
-      $(self.refs.text.getDOMNode()).val(text);
+      $(ReactDOM.findDOMNode(self.refs.text)).val(text);
     });
     $el.on('submit', function(ev) {
       $el.find('.is-submit').attr('disabled', true);
@@ -127,12 +128,12 @@ var TextForm = React.createClass({
     setTimeout(function() { self.handleChange(); }, 500);
   }
   , handleChange: function() {
-    var value = this.refs.textarea.getDOMNode().value.trim()
+    var value = ReactDOM.findDOMNode(this.refs.textarea).value.trim()
     store.set('text', value)
     this.setState({value: value});
   }
   , componentWillUpdate: function(nextProps, nextState) {
-    $(this.getDOMNode()).trigger('lgtm:text-change', nextState.value);
+    $(ReactDOM.findDOMNode(this)).trigger('lgtm:text-change', nextState.value);
   }
   , render: function() {
     return (
@@ -153,7 +154,7 @@ var ModeSelector = React.createClass({
   , componentDidMount: function() {
     var self = this;
     setTimeout(function() {
-      $(self.getDOMNode()).trigger('lgtm:mode-change', self.state.mode);
+      $(ReactDOM.findDOMNode(self)).trigger('lgtm:mode-change', self.state.mode);
     }, 500);
   }
   , handleModeChange: function(mode) {
@@ -167,7 +168,7 @@ var ModeSelector = React.createClass({
     this.handleModeChange('random');
   }
   , componentWillUpdate: function(nextProps, nextState) {
-    $(this.getDOMNode()).trigger('lgtm:mode-change', nextState.mode);
+    $(ReactDOM.findDOMNode(this)).trigger('lgtm:mode-change', nextState.mode);
   }
   , render: function() {
     return (
@@ -207,7 +208,7 @@ var LGTMForm = React.createClass({
   }
 });
 
-React.renderComponent(<LGTMForm csrf={$lgtmForm.data('csrf')}
-                                loginUser={$lgtmForm.data('login-user')} />,
-                      $lgtmForm.get(0)
-                     );
+ReactDOM.render(<LGTMForm csrf={$lgtmForm.data('csrf')}
+                          loginUser={$lgtmForm.data('login-user')} />,
+                $lgtmForm.get(0)
+               );

@@ -5,11 +5,8 @@ var JS_RE = /\.js$/
 
 module.exports = function (options) {
   var root = resolve(options.root || '.')
-  , bundleOpts = {
-    debug: !!options.debug
-  }
   ;
-  
+
   return function* (next) {
     var path = this.path
     , minify, code
@@ -27,7 +24,6 @@ module.exports = function (options) {
       b.transform(options.transform);
     }
 
-    return this.body = b.bundle(bundleOpts);
+    return this.body = b.bundle();
   };
-
 };

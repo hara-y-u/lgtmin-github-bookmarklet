@@ -14,11 +14,12 @@ module.exports = GitHubApiClient;
 
 /**
  * abstracts retriving access token of github api
- * @param {Object} app koa app object configured to use session, route and csrf
+ * @param {Object} app koa app object configured to use session and csrf
+ * @param {Object} router koa-router object
  * @param {Object} options
  *   - [`callbackPath`] OAuth callback path
  */
-function GitHubApiClient(app, options) {
+function GitHubApiClient(app, router, options) {
   var self = this
   , requestAccessToken
   , verifyState
@@ -59,7 +60,7 @@ function GitHubApiClient(app, options) {
   };
 
   // Configure App
-  app.get(this.callbackPath, function *(next) {
+  router.get(this.callbackPath, function *(next) {
     var code = this.request.query.code
     , state = this.request.query.state
     , decodedState
