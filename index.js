@@ -5,7 +5,7 @@ var util = require('util')
 , path = require('path')
 , koa = require('koa')
 , common = require('koa-common')
-, router = require('koa-router')
+, router = require('koa-router')()
 , stylus = require('stylus')
 , staticCache = require('koa-static-cache')
 , views = require('co-views')
@@ -93,14 +93,11 @@ app.use(staticCache(path.join(__dirname, 'assets'), {
   , gzip: true
 }));
 
-// routes
-app.use(router(app));
-
-client = new Client(app, {
+client = new Client(app, router, {
   scope: 'user repo'
 });
 
-app.get('/', function *(next) {
+router.get('/', function *(next) {
   var req = this.request
   , bmltCode = yield Q.denodeify(fs.readFile)(
     __dirname + '/assets/src/bookmarklet.js', 'utf8'
@@ -113,7 +110,7 @@ app.get('/', function *(next) {
     ;
   })
   ;
-  
+
   yield this.render('index', {
    bmltCode: bmltCode
   });
@@ -138,13 +135,13 @@ function assertParams(ctx, params, valids) {
   }
 }
 
-app.get('/out', function* (next) {
+router.get('/out', function* (next) {
   this.session.github_login_user = null;
   client.saveToken(this, null);
   this.redirect('back');
 });
 
-app.get('/lgtm', client.requireAuth(function *(next) {
+router.get('/lgtm', client.requireAuth(function *(next) {
   var NUM_LGTMS = 3
   ;
 
@@ -161,7 +158,7 @@ app.get('/lgtm', client.requireAuth(function *(next) {
   });
 }));
 
-app.post('/lgtm', client.requireAuth(function *(next) {
+router.post('/lgtm', client.requireAuth(function *(next) {
   var ret
   , lgtm = yield parse(this)
   ;
@@ -191,5 +188,11 @@ app.post('/lgtm', client.requireAuth(function *(next) {
     + '&number=' + lgtm.number
   ;
 }));
+
+
+// routes
+app
+  .use(router.routes())
+  .use(router.allowedMethods());
 
 app.listen(port);
