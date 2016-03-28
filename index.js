@@ -3,6 +3,7 @@
 var util = require('util')
 , fs = require('fs')
 , path = require('path')
+, request = require('request')
 , koa = require('koa')
 , common = require('koa-common')
 , router = require('koa-router')()
@@ -141,11 +142,26 @@ router.get('/out', function* (next) {
   this.redirect('back');
 });
 
-router.get('/lgtm', client.requireAuth(function *(next) {
-  var NUM_LGTMS = 3
+// Wrapper for lgtm.in/g
+router.get('/random', function *(next) {
+  var sendRequest = Q.denodeify(request)
+  , user = this.request.query.user
+  , json
   ;
 
-  // cache
+  json = yield sendRequest({
+    url: 'http://www.lgtm.in/g/' + (user ? user : ''),
+    headers: {
+      'Accept': 'application/json'
+    }
+  }).then((res) => { return res[res.length -1]; });
+
+  this.set('Cache-Control', 'no-store, no-cache');
+  this.body = JSON.parse(json);
+});
+
+router.get('/lgtm', client.requireAuth(function *(next) {
+  // cache github login user
   if (!this.session.github_login_user) {
     this.session.github_login_user
       = yield Q.denodeify(this.github.user.get)({})

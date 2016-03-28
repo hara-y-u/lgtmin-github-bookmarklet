@@ -20,9 +20,9 @@ var LGTMSubmitImage = React.createClass({
   }
   , lgtmEndPoint: function(mode) {
     if (mode == 'random') {
-      return 'http://www.lgtm.in/g';
+      return '/random';
     } else {
-      return 'http://www.lgtm.in/g/' + this.props.loginUser;
+      return '/random?user=' + this.props.loginUser;
     }
   }
   , updateLGTMs: function(mode) {
