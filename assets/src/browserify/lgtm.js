@@ -6,7 +6,6 @@ var React = require('react')
 , parsedUrl = url.parse(location.href, true)
 , query = parsedUrl.query
 , $lgtmForm = $('#lgtm-form')
-, transparentGIFUrl = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=='
 , store = require('store')
 ;
 
@@ -16,7 +15,7 @@ if (!store.enabled) {
 
 var LGTMSubmitImage = React.createClass({
   getInitialState: function() {
-    return {lgtm: {hash: '', actualImageUrl: transparentGIFUrl}};
+    return {lgtm: {hash: '' }};
   }
   , lgtmEndPoint: function(mode) {
     if (mode == 'random') {
@@ -25,12 +24,13 @@ var LGTMSubmitImage = React.createClass({
       return '/random?user=' + this.props.loginUser;
     }
   }
+  , imageUrl: function() {
+    return '//lgtm.in/p/' + this.state.lgtm.hash;
+  }
   , updateLGTMs: function(mode) {
     var self = this;
     $.getJSON(this.lgtmEndPoint(mode) + '?' + this.props.requestId)
-      .done(function (data) {
-        self.setState({lgtm: data})
-      });
+      .done(function (data) { self.setState({lgtm: data}) });
   }
   , componentDidMount: function() {
     var self = this
@@ -52,25 +52,38 @@ var LGTMSubmitImage = React.createClass({
     }
   }
   , render: function() {
+    var self = this;
     return (
-      <form className='lgtm-form' method='post' action='/lgtm'
-            data-mode={this.props.mode}>
-        <input className='lgtm-form__item' type='hidden'
-               name='_csrf' value={this.props.csrf} />
-        <input className='lgtm-form__item' type='hidden'
-               name='text' ref='text' />
-        <input className='lgtm-form__item' type='hidden'
-               name='user' value={this.props.user} />
-        <input className='lgtm-form__item' type='hidden'
-               name='repo' value={this.props.repo} />
-        <input className='lgtm-form__item' type='hidden'
-               name='number' value={this.props.number} />
-        <input className='lgtm-form__item' type='hidden'
-               name='hash' value={this.state.lgtm.hash} />
-        <button className='lgtm-form__item is-submit' typo='submit'>
-          <img src={this.state.lgtm.trackableImageUrl} />
-        </button>
-      </form>
+      (function() {
+        if (self.state.lgtm.hash == '') {
+          return (
+            <div className='loading'>
+              <p>Loading...</p>
+            </div>
+          );
+        } else {
+          return (
+            <form className='lgtm-form' method='post' action='/lgtm'
+                  data-mode={self.props.mode}>
+              <input className='lgtm-form__item' type='hidden'
+                     name='_csrf' value={self.props.csrf} />
+              <input className='lgtm-form__item' type='hidden'
+                     name='text' ref='text' />
+              <input className='lgtm-form__item' type='hidden'
+                     name='user' value={self.props.user} />
+              <input className='lgtm-form__item' type='hidden'
+                     name='repo' value={self.props.repo} />
+              <input className='lgtm-form__item' type='hidden'
+                     name='number' value={self.props.number} />
+              <input className='lgtm-form__item' type='hidden'
+                     name='hash' value={self.state.lgtm.hash} />
+              <button className='lgtm-form__item is-submit' type='submit'>
+                <img src={self.imageUrl()} />
+              </button>
+            </form>
+          );
+        }
+      })()
     );
   }
 });
@@ -121,7 +134,7 @@ var LGTMSubmitImageList = React.createClass({
 
 var TextForm = React.createClass({
   getInitialState: function() {
-    return {value: store.get('text') || 'LGTM!'};
+    return {value: store.get('text') || 'LGTM'};
   }
   , componentDidMount: function() {
     var self = this;
