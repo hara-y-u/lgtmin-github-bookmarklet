@@ -29,8 +29,10 @@ var LGTMSubmitImage = React.createClass({
   }
   , updateLGTMs: function(mode) {
     var self = this;
-    $.getJSON(this.lgtmEndPoint(mode) + '?' + this.props.requestId)
-      .done(function (data) { self.setState({lgtm: data}) });
+    if (self.lgtmReq) { self.lgtmReq.abort(); }
+    self.lgtmReq = $.getJSON(
+      this.lgtmEndPoint(mode) + '?' + this.props.requestId
+    ).done(function (data) { self.setState({lgtm: data}) });
   }
   , componentDidMount: function() {
     var self = this
