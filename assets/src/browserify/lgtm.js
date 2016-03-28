@@ -56,36 +56,32 @@ var LGTMSubmitImage = React.createClass({
   , render: function() {
     var self = this;
     return (
-      (function() {
-        if (self.state.lgtm.hash == '') {
-          return (
-            <div className='loading'>
-              <p>Loading...</p>
-            </div>
-          );
-        } else {
-          return (
-            <form className='lgtm-form' method='post' action='/lgtm'
-                  data-mode={self.props.mode}>
-              <input className='lgtm-form__item' type='hidden'
-                     name='_csrf' value={self.props.csrf} />
-              <input className='lgtm-form__item' type='hidden'
-                     name='text' ref='text' />
-              <input className='lgtm-form__item' type='hidden'
-                     name='user' value={self.props.user} />
-              <input className='lgtm-form__item' type='hidden'
-                     name='repo' value={self.props.repo} />
-              <input className='lgtm-form__item' type='hidden'
-                     name='number' value={self.props.number} />
-              <input className='lgtm-form__item' type='hidden'
-                     name='hash' value={self.state.lgtm.hash} />
+      <form className='lgtm-form' method='post' action='/lgtm'
+            data-mode={self.props.mode}>
+        <input className='lgtm-form__item' type='hidden'
+               name='_csrf' value={self.props.csrf} />
+        <input className='lgtm-form__item' type='hidden'
+               name='text' ref='text' />
+        <input className='lgtm-form__item' type='hidden'
+               name='user' value={self.props.user} />
+        <input className='lgtm-form__item' type='hidden'
+               name='repo' value={self.props.repo} />
+        <input className='lgtm-form__item' type='hidden'
+               name='number' value={self.props.number} />
+        <input className='lgtm-form__item' type='hidden'
+               name='hash' value={self.state.lgtm.hash} />
+        {(function() {
+          if (self.state.lgtm.hash == '') {
+            return <div className='loading'><p>Loading...</p></div>
+          } else {
+            return (
               <button className='lgtm-form__item is-submit' type='submit'>
                 <img src={self.imageUrl()} />
               </button>
-            </form>
-          );
-        }
-      })()
+            );
+          }
+        })()}
+      </form>
     );
   }
 });
