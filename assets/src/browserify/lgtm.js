@@ -68,7 +68,7 @@ var LGTMSubmitImage = React.createClass({
         <input className='lgtm-form__item' type='hidden'
                name='hash' value={this.state.lgtm.hash} />
         <button className='lgtm-form__item is-submit' typo='submit'>
-          <img src={this.state.lgtm.actualImageUrl} />
+          <img src={this.state.lgtm.trackableImageUrl} />
         </button>
       </form>
     );
