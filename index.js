@@ -3,7 +3,6 @@
 var util = require('util')
 , fs = require('fs')
 , path = require('path')
-, request = require('request')
 , koa = require('koa')
 , common = require('koa-common')
 , router = require('koa-router')()
@@ -144,12 +143,11 @@ router.get('/out', function* (next) {
 
 // Wrapper for lgtm.in/g
 router.get('/random', function *(next) {
-  var sendRequest = Q.denodeify(request)
-  , user = this.request.query.user
+  var user = this.request.query.user
   , json
   ;
 
-  json = yield sendRequest({
+  json = yield request({
     url: 'http://www.lgtm.in/g/' + (user ? user : ''),
     headers: {
       'Accept': 'application/json'
