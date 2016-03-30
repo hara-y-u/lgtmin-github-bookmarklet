@@ -22,7 +22,6 @@ var util = require('util')
 , nib = require('nib')
 , jeet = require('jeet')
 , browserify = require('./browserify-middleware')
-, reactify = require('reactify')
 , lgtmMarkdown = function(hash) {
   return '[![LGTM](http://www.lgtm.in/p/' + hash + ')]'
     + '(http://www.lgtm.in/i/' + hash + ')'
@@ -62,8 +61,8 @@ app.use(function *(next) {
 if (process.env.NODE_ENV != 'production') {
   // browserify dynamically only on development
   app.use(browserify({
-    root: __dirname + '/assets/src/browserify'
-    , transform: reactify
+    dir: __dirname + '/assets/src/browserify'
+    , transform: ['babelify', { presets: ['es2015', 'react'] }]
   }));
   // stylus
   app.use(function *(next) {
