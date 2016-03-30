@@ -1,9 +1,10 @@
 'use strict';
 
-var util = require('util')
+const util = require('util')
 , fs = require('fs')
 , path = require('path')
 , koa = require('koa')
+, app = koa()
 , common = require('koa-common')
 , router = require('koa-router')()
 , stylus = require('stylus')
@@ -13,21 +14,19 @@ var util = require('util')
 , Q = require('q')
 , request = Q.denodeify(require('request'))
 , port = process.env.PORT || 3000
-, app = koa()
 , csrf = require('koa-csrf')
 , key = process.env.APP_KEY || 'im a secret'
 , Client = require('./github-api-client.js')
-, client
 , UglifyJs = require('uglify-js')
 , nib = require('nib')
 , jeet = require('jeet')
 , browserify = require('./browserify-middleware')
-, lgtmMarkdown = function(hash) {
-  return '[![LGTM](http://www.lgtm.in/p/' + hash + ')]'
-    + '(http://www.lgtm.in/i/' + hash + ')'
-}
+, lgtmMarkdown = hash => `[![LGTM](http://www.lgtm.in/p/${hash})](http://www.lgtm.in/i/${hash})`
 , TITLE = 'LGTM.in GitHub Bookmarklet'
 ;
+
+let client;
+
 
 // base setup
 app.use(common.logger());
@@ -37,10 +36,9 @@ csrf(app);
 
 // views
 app.use(function *(next) {
-  var _render = views('views', { default: 'jade' });
-  this.render = function (view, locals) {
-    var body, html
-    ;
+  const _render = views('views', { default: 'jade' });
+  this.render = (view, locals) => {
+    let body, html;
 
     if (!locals) locals = {};
 
@@ -49,7 +47,7 @@ app.use(function *(next) {
     return function *() {
       this.type = 'text/html';
       body = yield _render(view, locals);
-      html = yield _render('layout', { title: TITLE, body: body });
+      html = yield _render('layout', { title: TITLE, body });
       this.body = html;
     }
   }
@@ -61,7 +59,7 @@ app.use(function *(next) {
 if (process.env.NODE_ENV != 'production') {
   // browserify dynamically only on development
   app.use(browserify({
-    dir: __dirname + '/assets/src/browserify'
+    dir: `${__dirname}/assets/src/browserify`
     , transform: ['babelify', { presets: ['es2015', 'react'] }]
   }));
   // stylus
@@ -77,7 +75,7 @@ if (process.env.NODE_ENV != 'production') {
     yield Q.denodeify(stylus.middleware({
       src: path.join(__dirname, '/assets/src'),
       dest: path.join(__dirname, '/assets'),
-      compile: compile
+      compile
     }))(this.req, this.res);
 
     yield next;
@@ -95,27 +93,23 @@ client = new Client(app, router, {
 });
 
 router.get('/', function *(next) {
-  var req = this.request
-  , bmltCode = yield Q.denodeify(fs.readFile)(
-    __dirname + '/assets/src/bookmarklet.js', 'utf8'
-  ).then(function(data) {
-    var baseUrl = req.protocol + '://' + req.get('host');
-    data = data.replace('{BASE_URL}', baseUrl);
-    return 'javascript:(function(window,undefined) {'
-      + encodeURIComponent(UglifyJs.minify(data, {fromString: true}).code)
-      + '})(window);'
-    ;
-  })
-  ;
+  const req = this.request,
+        bmltCode = yield Q.denodeify(fs.readFile)(
+          `${__dirname}/assets/src/bookmarklet.js`, 'utf8'
+        ).then(data => {
+          const baseUrl = `${req.protocol}://${req.get('host')}`;
+          data = data.replace('{BASE_URL}', baseUrl);
+          return `javascript:(function(window,undefined) {${encodeURIComponent(UglifyJs.minify(data, {fromString: true}).code)}})(window);`
+          ;
+        });
 
   yield this.render('index', {
-   bmltCode: bmltCode
+   bmltCode
   });
 });
 
 function assertParams(ctx, params, requiredKeys) {
-  var key, val
-  ;
+  let key, val;
   for(key of requiredKeys) {
     val = params[key];
     if(val == null || val == '') {
@@ -132,12 +126,11 @@ router.get('/out', function* (next) {
 
 // Wrapper for lgtm.in/g
 router.get('/random', function *(next) {
-  var user = this.request.query.user
-  , json
-  ;
+  const user = this.request.query.user;
+  let json;
 
   json = yield request({
-    url: 'http://www.lgtm.in/g/' + (user ? user : ''),
+    url: `http://www.lgtm.in/g/${user ? user : ''}`,
     headers: {
       'Accept': 'application/json'
     }
@@ -152,7 +145,7 @@ router.get('/lgtm', client.requireAuth(function *(next) {
   if (!this.session.github_login_user) {
     this.session.github_login_user
       = yield Q.denodeify(this.github.user.get)({})
-      .then(function(ret) { return ret; });
+      .then(ret => ret);
   }
 
   yield this.render('lgtm', {
@@ -162,9 +155,8 @@ router.get('/lgtm', client.requireAuth(function *(next) {
 }));
 
 router.post('/lgtm', client.requireAuth(function *(next) {
-  var ret
-  , lgtm = yield parse(this)
-  ;
+  let ret;
+  const lgtm = yield parse(this);
 
   this._lgtm = lgtm;
 
@@ -179,18 +171,13 @@ router.post('/lgtm', client.requireAuth(function *(next) {
     , repo: lgtm.repo
     , number: lgtm.number
     , body: lgtm.text + lgtmMarkdown(lgtm.hash)
-  }).then(function(ret) {
-    return ret;
-  });
+  }).then(ret => ret);
 
   yield this.render('lgtm_create');
 }, function *() {
-  var lgtm = this._lgtm
-  ;
+  const lgtm = this._lgtm;
 
-  return '/lgtm?user=' + lgtm.user
-    + '&repo=' + lgtm.repo
-    + '&number=' + lgtm.number
+  return `/lgtm?user=${lgtm.user}&repo=${lgtm.repo}&number=${lgtm.number}`
   ;
 }));
 
