@@ -132,7 +132,7 @@ var LGTMSubmitImageList = React.createClass({
 
 var TextForm = React.createClass({
   getInitialState: function() {
-    return {value: store.get('text') || 'LGTM'};
+    return {value: store.get('text') };
   }
   , componentDidMount: function() {
     var self = this;

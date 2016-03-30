@@ -26,8 +26,6 @@ var util = require('util')
 , lgtmMarkdown = function(hash) {
   return '[![LGTM](http://www.lgtm.in/p/' + hash + ')]'
     + '(http://www.lgtm.in/i/' + hash + ')'
-    + '\n\n[:+1:](http://www.lgtm.in/u/' + hash + ')'
-    + '[:-1:](http://www.lgtm.in/r/' + hash + ')'
 }
 , TITLE = 'LGTM.in GitHub Bookmarklet'
 ;
@@ -116,21 +114,13 @@ router.get('/', function *(next) {
   });
 });
 
-function assertParams(ctx, params, valids) {
+function assertParams(ctx, params, requiredKeys) {
   var key, val
   ;
-  try {
-    if(valids.sort().toString()
-       !== Object.keys(params).sort().toString()) {
-      ctx.throw(400, 'Bad Request');
-    }
-  } catch (e) {
-    ctx.throw(400, 'Bad Request');
-  }
-  for(key in params) {
+  for(key of requiredKeys) {
     val = params[key];
     if(val == null || val == '') {
-      ctx.throw(400, 'Bad Request');
+      ctx.throw(400, 'Bad Request, required key is missing.');
     }
   }
 }
@@ -181,13 +171,15 @@ router.post('/lgtm', client.requireAuth(function *(next) {
 
   this.assertCsrf(lgtm);
   delete lgtm._csrf;
-  assertParams(this, lgtm, ['text', 'user', 'repo', 'number', 'hash']);
+  assertParams(this, lgtm, ['user', 'repo', 'number', 'hash']);
+
+  if (lgtm.text != '') { lgtm.text += '\n\n'; }
 
   ret = yield Q.denodeify(this.github.issues.createComment)({
     user: lgtm.user
     , repo: lgtm.repo
     , number: lgtm.number
-    , body: lgtm.text + '\n\n' + lgtmMarkdown(lgtm.hash)
+    , body: lgtm.text + lgtmMarkdown(lgtm.hash)
   }).then(function(ret) {
     return ret;
   });
