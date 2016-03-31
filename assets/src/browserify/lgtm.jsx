@@ -34,7 +34,7 @@ class LGTMSubmitImage extends React.Component {
     if (this.lgtmReq) { this.lgtmReq.abort(); }
     this.lgtmReq = $.getJSON(
       this.lgtmEndPoint(mode) + '?' + this.props.requestId
-    ).done((data) => { this.setState({lgtm: data}) });
+    ).done((data) => { this.setState({lgtm: data}); });
   }
   componentDidMount() {
     var $el = $(ReactDOM.findDOMNode(this))
@@ -73,7 +73,7 @@ class LGTMSubmitImage extends React.Component {
                name='hash' value={this.state.lgtm.hash} />
         {(() => {
           if (this.state.lgtm.hash == '') {
-            return <div className='loading'><p>Loading...</p></div>
+            return <div className='loading'><p>Loading...</p></div>;
           } else {
             return (
               <button className='lgtm-form__item is-submit' type='submit'>
@@ -173,7 +173,7 @@ class ModeSelector extends React.Component {
   }
   handleModeChange(mode) {
     this.setState({mode: mode});
-    store.set('mode', mode)
+    store.set('mode', mode);
   }
   modeToMyList() {
     this.handleModeChange('mylist');
