@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import url from 'url';
 import store from 'store';
 
-var parsedUrl = url.parse(location.href, true)
+let parsedUrl = url.parse(location.href, true)
 , query = parsedUrl.query
 , $lgtmForm = $('#lgtm-form')
 ;
@@ -37,7 +37,7 @@ class LGTMSubmitImage extends React.Component {
     ).done((data) => { this.setState({lgtm: data}); });
   }
   componentDidMount() {
-    var $el = $(ReactDOM.findDOMNode(this))
+    let $el = $(ReactDOM.findDOMNode(this))
     ;
     $(window).on('lgtm:text-change', (ev, text) => {
       $(ReactDOM.findDOMNode(this.refs.text)).val(text);
@@ -140,7 +140,7 @@ class TextForm extends React.Component {
     setTimeout(() => { this.handleChange(); }, 500);
   }
   handleChange() {
-    var value = ReactDOM.findDOMNode(this.refs.textarea).value.trim()
+    let value = ReactDOM.findDOMNode(this.refs.textarea).value.trim()
     store.set('text', value)
     this.setState({value: value});
   }
