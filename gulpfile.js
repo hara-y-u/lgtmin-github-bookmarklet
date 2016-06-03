@@ -1,25 +1,23 @@
 var gulp = require('gulp')
-, browserify = require('gulp-browserify')
-, reactify = require('reactify')
-, uglify = require('gulp-uglify')
+, fs = require('fs')
+, browserify = require('browserify')
 , stylus = require('gulp-stylus')
 , nib = require('nib')
 , jeet = require('jeet')
 ;
 
 gulp.task('browserify', function() {
-  gulp.src('./assets/src/browserify/lgtm.js')
-    .pipe(browserify({
-      transform: [reactify]
-    }))
-    .pipe(uglify())
-    .pipe(gulp.dest('./assets'))
+  browserify(__dirname + '/assets/src/browserify/lgtm.jsx')
+    .transform('babelify', {presets: ['es2015', 'react']})
+    .transform('uglifyify')
+    .bundle()
+    .pipe(fs.createWriteStream(__dirname + '/assets/lgtm.js'))
 });
 
 gulp.task('stylus', function() {
-  gulp.src('./assets/src/app.styl')
+  gulp.src(__dirname + '/assets/src/app.styl')
     .pipe(stylus({use: [nib(), jeet()]}))
-    .pipe(gulp.dest('./assets'));
+    .pipe(gulp.dest(__dirname + '/assets'));
 });
 
 gulp.task('default', ['browserify', 'stylus']);
